@@ -1,0 +1,12 @@
+E:\Websites\BitBucket\Plivo-Samples\Utilities\bin\Debug\Utilities.dll
+E:\Websites\BitBucket\Plivo-Samples\Utilities\bin\Debug\Utilities.pdb
+E:\Websites\BitBucket\Plivo-Samples\Utilities\obj\Debug\Utilities.dll
+E:\Websites\BitBucket\Plivo-Samples\Utilities\obj\Debug\Utilities.pdb
+E:\Websites\BitBucket\Plivo-Samples\Utilities\bin\Debug\System.Net.Http.dll
+E:\Websites\BitBucket\Plivo-Samples\Utilities\bin\Debug\System.Net.Http.xml
+E:\Websites\GitHub\Plivo-MVC-Samples\Utilities\bin\Debug\Utilities.dll
+E:\Websites\GitHub\Plivo-MVC-Samples\Utilities\bin\Debug\Utilities.pdb
+E:\Websites\GitHub\Plivo-MVC-Samples\Utilities\bin\Debug\System.Net.Http.dll
+E:\Websites\GitHub\Plivo-MVC-Samples\Utilities\bin\Debug\System.Net.Http.xml
+E:\Websites\GitHub\Plivo-MVC-Samples\Utilities\obj\Debug\Utilities.dll
+E:\Websites\GitHub\Plivo-MVC-Samples\Utilities\obj\Debug\Utilities.pdb
