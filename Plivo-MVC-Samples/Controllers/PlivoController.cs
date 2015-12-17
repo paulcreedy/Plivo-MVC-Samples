@@ -261,7 +261,7 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Get_s the ap i_ identifier.
+        /// Get's the api identifier.
         /// </summary>
         /// <returns>ActionResult.</returns>
         public ActionResult Get_API_ID()
@@ -284,7 +284,7 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Get_s the uui d_ identifier.
+        /// Get's the uuid identifier.
         /// </summary>
         /// <returns>ActionResult.</returns>
         public ActionResult Get_UUID_ID()
