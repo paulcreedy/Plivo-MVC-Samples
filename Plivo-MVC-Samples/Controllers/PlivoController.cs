@@ -392,5 +392,18 @@ namespace Plivo_MVC_Samples.Controllers
 
             return Content("OK", "text/xml");
         }
+
+        /// <summary>
+        /// Plays a recording. This could be music or a welcome message.
+        /// </summary>
+        /// <returns>ActionResult.</returns>
+        public ActionResult PlayRecording()
+        {
+            Plivo.XML.Response resp = new Plivo.XML.Response();
+            resp.AddPlay("https://s3.amazonaws.com/plivocloud/music.mp3", new Dictionary<string, string>() { });
+
+            var xml = resp.ToString();
+            return Content(xml, "text/xml");
+        }
     }
 }
