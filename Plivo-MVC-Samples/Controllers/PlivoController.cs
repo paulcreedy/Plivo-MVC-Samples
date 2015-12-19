@@ -70,7 +70,7 @@ namespace Plivo_MVC_Samples.Controllers
             _authID = ConfigurationManager.AppSettings["AuthID"];
             _authToken = ConfigurationManager.AppSettings["AuthToken"];
             _emailTo = ConfigurationManager.AppSettings["EmailTo"];
-            _forwardCallNumber = "442921202870";
+            _forwardCallNumber = ConfigurationManager.AppSettings["ForwardCallTo"];
         }
 
         /// <summary>

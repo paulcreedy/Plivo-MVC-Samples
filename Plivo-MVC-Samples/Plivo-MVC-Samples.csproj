@@ -42,11 +42,11 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Plivo, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Plivo.2.0.1\lib\net40\Plivo.dll</HintPath>
+      <HintPath>..\packages\Plivo.3.0.0\lib\net40\Plivo.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net4\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=100.0.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharpSigned.105.1.0\lib\net4\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -122,12 +122,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\PlivoController.cs" />
+    <Compile Include="Controllers\SMSController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CallAnswerResponseParameters.cs" />
     <Compile Include="Models\DialActionResponseParameters.cs" />
     <Compile Include="Models\RecordResponseParameters.cs" />
+    <Compile Include="Models\SMSDeliveryResponseParameters.cs" />
     <Compile Include="Models\TranscriptionResponseParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
