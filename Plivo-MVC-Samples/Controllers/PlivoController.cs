@@ -410,22 +410,134 @@ namespace Plivo_MVC_Samples.Controllers
             return Content(xml, "text/xml");
         }
 
-        public ActionResult SequencialDial()
+        /// <summary>
+        /// Sequentialy dial one or more numbers with a specified ring duration.
+        /// The first call is made to the number in order, with a timeout value to 20s. If the call is not answered within X seconds, Plivo will then dial out to the second number.
+        /// </summary>
+        /// <returns>ActionResult.</returns>
+        public ActionResult SequentialDial()
         {
             Plivo.XML.Response resp = new Plivo.XML.Response();
             Plivo.XML.Dial dial = new Plivo.XML.Dial(new Dictionary<string, string>()
                 {
-                    {"timeout", "3"}, // The duration (in seconds) for which the called party has to be given a ring.
-                    {"action", _baseUrl + "/DialStatus"} // Redirect to this URL after leaving Dial. 
+                    {"timeout", "10"}, // The duration (in seconds) for which the called party has to be given a ring.
+                    {"action", _baseUrl + "/Plivo/DialStatus"} // Redirect to this URL after leaving Dial. 
                 });
-            dial.AddNumber("02921202870", new Dictionary<string, string>() { });
-            dial.AddNumber("01443776504", new Dictionary<string, string>() { });
+            dial.AddNumber("11111111111", new Dictionary<string, string>() { });
+            dial.AddNumber("22222222222", new Dictionary<string, string>() { });
 
             resp.Add(dial);
 
             var xml = resp.ToString();
             return Content(xml, "text/xml");
+        }
 
+        /// <summary>
+        /// The Wait element waits silently for a specified number of seconds. If Wait is the first element in a XML document, Plivo will wait the specified number of seconds before picking up the call.
+        /// </summary>
+        /// <returns>ActionResult.</returns>
+        public ActionResult Wait()
+        {
+            Plivo.XML.Response resp = new Plivo.XML.Response();
+
+            // Add Speak XML Tag
+            resp.AddSpeak("I will wait for 10 seconds", new Dictionary<string, string>() { });
+
+            // Add Wait XML Tag
+            resp.AddWait(new Dictionary<string, string>()
+                {
+                    {"length", "10"}
+                });
+
+            // Add Speak XML Tag
+            resp.AddSpeak("I just waited 10 seconds", new Dictionary<string, string>() { });
+
+            var xml = resp.ToString();
+            return Content(xml, "text/xml");
+        }
+
+        /// <summary>
+        /// An example of using an IVR system where you can either press 1 to leave a voicemail or 2 to be connected to another number.
+        /// </summary>
+        /// <returns>ActionResult.</returns>
+        public ActionResult IVR()
+        {
+            // This is the message that Plivo reads when the caller dials in
+            string ivr_message1 = "Welcome to the Plivo IVR Demo App. Press 1 to leave a message. Press 2 to be connected to a real person.";
+
+            // This is the message that Plivo reads when the caller does nothing at all
+            string ivr_no_input_message = "Sorry, I didn't catch that. Please hangup and try again later.";
+
+            Plivo.XML.Response resp = new Plivo.XML.Response();
+            string getdigits_action_url = _baseUrl + "Plivo/IVR_Response";
+
+            // Add GetDigits XML Tag
+            GetDigits gd = new GetDigits("", new Dictionary<string, string>()
+                {
+                    {"action", getdigits_action_url},
+                    {"method", "POST"},
+                    {"timeout","7"},
+                    {"numDigits","1"},
+                    {"retries","1"}
+                });
+
+            // Add Speak XML Tag
+            gd.AddSpeak(ivr_message1, new Dictionary<string, string>() { });
+            resp.Add(gd);
+            // Add Speak XML Tag
+            resp.AddSpeak(ivr_no_input_message, new Dictionary<string, string>() { });
+
+            var xml = resp.ToString();
+            return Content(xml, "text/xml");
+        }
+
+        /// <summary>
+        /// Catches the response from a digit being pressed, for example in an IVR situation.
+        /// </summary>
+        /// <param name="Digits">The digits.</param>
+        /// <returns>ActionResult.</returns>
+        public ActionResult IVR_Response(string Digits)
+        {
+            string wrong_input_message = "Sorry, it's a wrong input.";
+
+            Plivo.XML.Response resp = new Plivo.XML.Response();
+
+            // If the digit pressed was 1 announce "Please leave your message after the beep", then take a recording
+            if (Digits == "1")
+            {
+                resp.AddSpeak("Please leave your message after the beep", new Dictionary<string, string>() { });
+                resp.AddRecord(new Dictionary<string, string>()
+                {
+                    {"action",_baseUrl + "Plivo/SaveRecordUrl"}, // Submit the result of the record to this URL
+                    {"method","GET"}, // HTTP method to submit the action URL
+                    {"maxLength","30"}, // Maximum number of seconds to record 
+                    {"transcriptionType","auto"}, // The type of transcription required
+                    {"transcriptionUrl", _baseUrl + "Plivo/Transcription"}, // The URL where the transcription while be sent from Plivo
+                    {"transcriptionMethod","GET"} // The method used to invoke transcriptionUrl
+                });
+                resp.AddSpeak("Recording not received", new Dictionary<string, string>() { });
+            }
+            // If digit 2 is pressed connect the caller to another number
+            else if (Digits == "2")
+            {
+                // Add Speak XML Tag
+                resp.AddSpeak("Connecting your call..", new Dictionary<string, string>() { });
+
+                // Add Dial XML Tag
+                Plivo.XML.Dial dial = new Plivo.XML.Dial(new Dictionary<string, string>() { });
+                dial.AddNumber(_forwardCallNumber, new Dictionary<string, string>() { });
+
+                resp.Add(dial);
+            }
+            // If neither condition above was true, annount a default message to the caller.
+            else
+            {
+                // Add Speak XML Tag
+                resp.AddSpeak(wrong_input_message, new Dictionary<string, string>() { });
+            }
+
+            var xml = resp.ToString();
+            return Content(xml, "text/xml");
         }
     }
 }
