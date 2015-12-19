@@ -189,18 +189,16 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Gets the status of a call
+        /// Gets the Action DialStatus of a call
         /// </summary>
-        /// <param name="DialStatus">The dial status.</param>
-        /// <param name="DialALegUUID">The dial a leg UUID.</param>
-        /// <param name="DialBLegUUID">The dial b leg UUID.</param>
+        /// <param name="response">The response.</param>
         /// <returns>ActionResult.</returns>
-        public ActionResult DialStatus(string DialStatus, string DialALegUUID, string DialBLegUUID)
+        public ActionResult DialStatus(DialActionResponseParameters response)
         {
             // After completion of the call, Plivo will report back the status to the action URL in the Dial XML.
-            String status = DialStatus;
-            String aleg = DialALegUUID;
-            String bleg = DialBLegUUID;
+            String status = response.DialStatus;
+            String aleg = response.DialALegUUID;
+            String bleg = response.DialBLegUUID;
 
             Debug.WriteLine("Status : {0}, ALeg UUID : {1}, BLeg UUID : {2}", status, aleg, bleg);
             return Content("OK", "text/xml");
@@ -325,13 +323,18 @@ namespace Plivo_MVC_Samples.Controllers
         /// Voicemails this instance.
         /// </summary>
         /// <returns>ActionResult.</returns>
-        public ActionResult Voicemail()
+        public ActionResult Voicemail(CallAnswerResponseParameters response)
         {
+            // The response parameter contains information about the call.
+            // You could optionally do something with this data such as save it to a database
+            // or even pass it into the action of the AddRecord
+            // The CallUUID property can be used to link this calls related hops together.
+
             Plivo.XML.Response resp = new Plivo.XML.Response();
             resp.AddSpeak("Please leave your message after the beep", new Dictionary<string, string>() { });
             resp.AddRecord(new Dictionary<string, string>()
                 {
-                    {"action",_baseUrl + "Plivo/SaveRecordUrl"}, // Submit the result of the record to this URL
+                    {"action",_baseUrl + "Plivo/SaveRecordUrl?From="+response.From}, // Submit the result of the record to this URL
                     {"method","GET"}, // HTTP method to submit the action URL
                     {"maxLength","30"}, // Maximum number of seconds to record 
                     {"transcriptionType","auto"}, // The type of transcription required
@@ -347,22 +350,23 @@ namespace Plivo_MVC_Samples.Controllers
         /// <summary>
         /// Saves the record URL.
         /// </summary>
-        /// <param name="RecordParameters">The record parameters.</param>
+        /// <param name="recordParameters">The record parameters.</param>
         /// <returns>ActionResult.</returns>
-        public ActionResult SaveRecordUrl(RecordRequestParameters RecordParameters)
+        public ActionResult SaveRecordUrl(RecordResponseParameters recordParameters)
         {
             // Do something with the RecordUrl here such as send the link as an email or store it in a database etc.
 
             StringBuilder emailBody = new StringBuilder();
             emailBody.Append("Hi\r\n");
             emailBody.Append("Click the url below to listen to the voice mail.\r\n");
-            emailBody.Append(String.Format("Recording Url: {0} \r\n", RecordParameters.RecordUrl));
-            emailBody.Append(String.Format("Digits: {0} \r\n", RecordParameters.Digits));
-            emailBody.Append(String.Format("Recording Duration: {0} \r\n", RecordParameters.RecordingDuration));
-            emailBody.Append(String.Format("Recording Duration Ms: {0} \r\n", RecordParameters.RecordingDurationMs));
-            emailBody.Append(String.Format("RecordingStartMs: {0} \r\n", RecordParameters.RecordingStartMs));
-            emailBody.Append(String.Format("RecordingEndMs: {0} \r\n", RecordParameters.RecordingEndMs));
-            emailBody.Append(String.Format("RecordingID: {0} \r\n", RecordParameters.RecordingID));
+            emailBody.Append(String.Format("Recording Url: {0} \r\n", recordParameters.RecordUrl));
+            emailBody.Append(String.Format("Caller: {0}.\r\n", recordParameters.From));
+            emailBody.Append(String.Format("Digits: {0} \r\n", recordParameters.Digits));
+            emailBody.Append(String.Format("Recording Duration: {0} \r\n", recordParameters.RecordingDuration));
+            emailBody.Append(String.Format("Recording Duration Ms: {0} \r\n", recordParameters.RecordingDurationMs));
+            emailBody.Append(String.Format("RecordingStartMs: {0} \r\n", recordParameters.RecordingStartMs));
+            emailBody.Append(String.Format("RecordingEndMs: {0} \r\n", recordParameters.RecordingEndMs));
+            emailBody.Append(String.Format("RecordingID: {0} \r\n", recordParameters.RecordingID));
 
             Email.SendEmail(_emailTo, "Voicemail recording from Plivo Samples", emailBody.ToString());
 
@@ -374,7 +378,7 @@ namespace Plivo_MVC_Samples.Controllers
         /// </summary>
         /// <param name="TranscriptionParameters">The transcription parameters.</param>
         /// <returns>ActionResult.</returns>
-        public ActionResult Transcription(TranscriptionRequestParameters TranscriptionParameters)
+        public ActionResult Transcription(TranscriptionResponseParameters TranscriptionParameters)
         {
             // Do something with the transcription here such as send the text as an email, or store it in a database.
 
@@ -404,6 +408,24 @@ namespace Plivo_MVC_Samples.Controllers
 
             var xml = resp.ToString();
             return Content(xml, "text/xml");
+        }
+
+        public ActionResult SequencialDial()
+        {
+            Plivo.XML.Response resp = new Plivo.XML.Response();
+            Plivo.XML.Dial dial = new Plivo.XML.Dial(new Dictionary<string, string>()
+                {
+                    {"timeout", "3"}, // The duration (in seconds) for which the called party has to be given a ring.
+                    {"action", _baseUrl + "/DialStatus"} // Redirect to this URL after leaving Dial. 
+                });
+            dial.AddNumber("02921202870", new Dictionary<string, string>() { });
+            dial.AddNumber("01443776504", new Dictionary<string, string>() { });
+
+            resp.Add(dial);
+
+            var xml = resp.ToString();
+            return Content(xml, "text/xml");
+
         }
     }
 }

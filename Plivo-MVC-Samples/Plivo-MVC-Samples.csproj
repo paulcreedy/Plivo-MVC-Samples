@@ -125,8 +125,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\RecordRequestParameters.cs" />
-    <Compile Include="Models\TranscriptionRequestParameters.cs" />
+    <Compile Include="Models\CallAnswerResponseParameters.cs" />
+    <Compile Include="Models\DialActionResponseParameters.cs" />
+    <Compile Include="Models\RecordResponseParameters.cs" />
+    <Compile Include="Models\TranscriptionResponseParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
