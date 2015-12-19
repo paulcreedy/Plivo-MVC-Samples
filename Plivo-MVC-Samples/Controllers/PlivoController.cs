@@ -301,8 +301,9 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Calls the hunting.
+        /// Calls one number or sip user after another waiting for one of them to answer.
         /// </summary>
+        /// <seealso cref="SequentialDial"/>
         /// <returns>ActionResult.</returns>
         public ActionResult CallHunting()
         {
@@ -411,9 +412,10 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Sequentialy dial one or more numbers with a specified ring duration.
+        /// Sequentially dial one or more numbers with a specified ring duration.
         /// The first call is made to the number in order, with a timeout value to 20s. If the call is not answered within X seconds, Plivo will then dial out to the second number.
         /// </summary>
+        /// <seealso cref="CallHunting"/>
         /// <returns>ActionResult.</returns>
         public ActionResult SequentialDial()
         {
