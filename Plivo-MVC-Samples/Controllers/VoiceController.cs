@@ -30,7 +30,7 @@ namespace Plivo_MVC_Samples.Controllers
     /// <summary>
     /// Class PlivoController.
     /// </summary>
-    public class PlivoController : Controller
+    public class VoiceController : Controller
     {
         /// <summary>
         /// The base url used in the samples. Set this to the website that your code is running on
@@ -62,9 +62,9 @@ namespace Plivo_MVC_Samples.Controllers
         private string _emailTo;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PlivoController"/> class.
+        /// Initializes a new instance of the <see cref="VoiceController"/> class.
         /// </summary>
-        public PlivoController()
+        public VoiceController()
         {
             _baseUrl = ConfigurationManager.AppSettings["BaseUrl"];
             _authID = ConfigurationManager.AppSettings["AuthID"];
@@ -115,7 +115,7 @@ namespace Plivo_MVC_Samples.Controllers
         {
             Plivo.XML.Response resp = new Plivo.XML.Response();
             resp.AddSpeak("Please wait while your call is being transferred", new Dictionary<string, string>() { });
-            resp.AddRedirect(_baseUrl + "Plivo/Connect", new Dictionary<string, string>() { });
+            resp.AddRedirect(_baseUrl + "Voice/Connect", new Dictionary<string, string>() { });
             var xml = resp.ToString();
             return Content(xml, "text/xml");
         }
@@ -177,7 +177,7 @@ namespace Plivo_MVC_Samples.Controllers
             // Generate Dial XML
             Plivo.XML.Dial dial = new Plivo.XML.Dial(new Dictionary<string, string>()
                 {
-                    {"action",_baseUrl + "/DialStatus"}, // Redirect to this URL after leaving Dial.
+                    {"action",_baseUrl + "/Voice/DialStatus"}, // Redirect to this URL after leaving Dial.
                     {"method","GET"} // Submit to action URL using GET or POST.
                 });
             dial.AddNumber(_forwardCallNumber, new Dictionary<string, string>() { });
@@ -335,11 +335,11 @@ namespace Plivo_MVC_Samples.Controllers
             resp.AddSpeak("Please leave your message after the beep", new Dictionary<string, string>() { });
             resp.AddRecord(new Dictionary<string, string>()
                 {
-                    {"action",_baseUrl + "Plivo/SaveRecordUrl?From="+response.From}, // Submit the result of the record to this URL
+                    {"action",_baseUrl + "Voice/SaveRecordUrl?From="+response.From}, // Submit the result of the record to this URL
                     {"method","GET"}, // HTTP method to submit the action URL
                     {"maxLength","30"}, // Maximum number of seconds to record 
                     {"transcriptionType","auto"}, // The type of transcription required
-                    {"transcriptionUrl", _baseUrl + "Plivo/Transcription"}, // The URL where the transcription while be sent from Plivo
+                    {"transcriptionUrl", _baseUrl + "Voice/Transcription"}, // The URL where the transcription while be sent from Plivo
                     {"transcriptionMethod","GET"} // The method used to invoke transcriptionUrl
                 });
             resp.AddSpeak("Recording not received", new Dictionary<string, string>() { });
@@ -423,7 +423,7 @@ namespace Plivo_MVC_Samples.Controllers
             Plivo.XML.Dial dial = new Plivo.XML.Dial(new Dictionary<string, string>()
                 {
                     {"timeout", "10"}, // The duration (in seconds) for which the called party has to be given a ring.
-                    {"action", _baseUrl + "/Plivo/DialStatus"} // Redirect to this URL after leaving Dial. 
+                    {"action", _baseUrl + "/Voice/DialStatus"} // Redirect to this URL after leaving Dial. 
                 });
             dial.AddNumber("11111111111", new Dictionary<string, string>() { });
             dial.AddNumber("22222222222", new Dictionary<string, string>() { });
@@ -471,7 +471,7 @@ namespace Plivo_MVC_Samples.Controllers
             string ivr_no_input_message = "Sorry, I didn't catch that. Please hangup and try again later.";
 
             Plivo.XML.Response resp = new Plivo.XML.Response();
-            string getdigits_action_url = _baseUrl + "Plivo/IVR_Response";
+            string getdigits_action_url = _baseUrl + "Voice/IVR_Response";
 
             // Add GetDigits XML Tag
             GetDigits gd = new GetDigits("", new Dictionary<string, string>()
@@ -510,11 +510,11 @@ namespace Plivo_MVC_Samples.Controllers
                 resp.AddSpeak("Please leave your message after the beep", new Dictionary<string, string>() { });
                 resp.AddRecord(new Dictionary<string, string>()
                 {
-                    {"action",_baseUrl + "Plivo/SaveRecordUrl"}, // Submit the result of the record to this URL
+                    {"action",_baseUrl + "Voice/SaveRecordUrl"}, // Submit the result of the record to this URL
                     {"method","GET"}, // HTTP method to submit the action URL
                     {"maxLength","30"}, // Maximum number of seconds to record 
                     {"transcriptionType","auto"}, // The type of transcription required
-                    {"transcriptionUrl", _baseUrl + "Plivo/Transcription"}, // The URL where the transcription while be sent from Plivo
+                    {"transcriptionUrl", _baseUrl + "Voice/Transcription"}, // The URL where the transcription while be sent from Plivo
                     {"transcriptionMethod","GET"} // The method used to invoke transcriptionUrl
                 });
                 resp.AddSpeak("Recording not received", new Dictionary<string, string>() { });
@@ -531,7 +531,7 @@ namespace Plivo_MVC_Samples.Controllers
 
                 resp.Add(dial);
             }
-            // If neither condition above was true, annount a default message to the caller.
+            // If neither condition above was true, announce a default message to the caller.
             else
             {
                 // Add Speak XML Tag
