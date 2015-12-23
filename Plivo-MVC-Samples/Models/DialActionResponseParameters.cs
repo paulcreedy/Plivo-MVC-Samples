@@ -6,7 +6,7 @@
 // Last Modified By : Paul
 // Last Modified On : 12-18-2015
 // ***********************************************************************
-// <copyright file="DialActionResponseParameters.cs" company="">
+// <copyright file="DialStatusResponseParameters.cs" company="">
 //     Copyright © Paul Creedy 2015
 // </copyright>
 // <summary></summary>
@@ -21,7 +21,7 @@ namespace Plivo_MVC_Samples.Models
     /// <summary>
     /// Data model to hold parameters that are sent to the action URL after Dial is completed.
     /// </summary>
-    public class DialActionResponseParameters
+    public class DialStatusResponseParameters
     {
         /// <summary>
         /// This indicates if the <Dial> attempt rang or not. It can be true or false.

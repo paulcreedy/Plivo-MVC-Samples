@@ -6,7 +6,7 @@
 // Last Modified By : Paul
 // Last Modified On : 12-16-2015
 // ***********************************************************************
-// <copyright file="PlivoController.cs" company="">
+// <copyright file="VoiceController.cs" company="">
 //     Copyright ©  2015
 // </copyright>
 // <summary></summary>
@@ -28,7 +28,7 @@ using Plivo_MVC_Samples.Models;
 namespace Plivo_MVC_Samples.Controllers
 {
     /// <summary>
-    /// Class PlivoController.
+    /// The VoiceController demonstrates ways of using Voice with Plivo, such as making calls, recordings, etc.
     /// </summary>
     public class VoiceController : Controller
     {
@@ -76,11 +76,11 @@ namespace Plivo_MVC_Samples.Controllers
         /// <summary>
         /// Greets the caller by name by looking up the caller from number and using text to speech to pronounce the callers name.
         /// </summary>
-        /// <param name="From">From.</param>
+        /// <param name="response">The response.</param>
         /// <returns>ActionResult.</returns>
         /// <remarks>In this example the look up numbers are stored in a dictionary, but in a production environment you would get this from external storage via a repository layer.</remarks>
-        public ActionResult GreetCaller(String From=null)
-        {  
+        public ActionResult GreetCaller(CallAnswerResponseParameters response)
+        {
 
             // Dictionary of known callers
             var callers = new Dictionary<string, string>() {
@@ -92,9 +92,9 @@ namespace Plivo_MVC_Samples.Controllers
             Plivo.XML.Response resp = new Plivo.XML.Response();
 
             // Can we get the callers name?
-            if (From !=null && callers.ContainsKey(From))
+            if (response.From != null && callers.ContainsKey(response.From))
             {
-                string body = "Hello " + callers[From];
+                string body = "Hello " + callers[response.From];
                 resp.AddSpeak(body, new Dictionary<string, string>() { });
             }
             else // No? Then we announce a default greeting.
@@ -111,7 +111,7 @@ namespace Plivo_MVC_Samples.Controllers
         /// </summary>
         /// <param name="From">From.</param>
         /// <returns>ActionResult.</returns>
-        public ActionResult CallTransfer(String From)
+        public ActionResult CallTransfer(CallAnswerResponseParameters response)
         {
             Plivo.XML.Response resp = new Plivo.XML.Response();
             resp.AddSpeak("Please wait while your call is being transferred", new Dictionary<string, string>() { });
@@ -144,11 +144,23 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Connects a caller to a number announcing that the Call is being connected.
+        /// Connects the specified request.
         /// </summary>
+        /// <param name="response">The response.</param>
         /// <returns>ActionResult.</returns>
-        public ActionResult Connect()
+        public ActionResult Connect(CallAnswerResponseParameters response)
         {
+
+            // The response hold information passed from Plivo about the call.
+            // Just for illustration we serialize it up and send it to your email address
+            string r = SerializeObject.Serialize(response);
+            StringBuilder emailBody = new StringBuilder();
+            emailBody.Append("Hi\r\n");
+            emailBody.Append("Here is the param response from an incoming call.\r\n");
+            emailBody.Append(String.Format("{0} \r\n", r));
+            Email.SendEmail(_emailTo, "Incoming call params", emailBody.ToString());
+
+
             Plivo.XML.Response resp = new Plivo.XML.Response();
 
             // Add Speak XML Tag
@@ -159,19 +171,27 @@ namespace Plivo_MVC_Samples.Controllers
             dial.AddNumber(_forwardCallNumber, new Dictionary<string, string>() { });
 
             resp.Add(dial);
-            Debug.WriteLine(resp.ToString());
 
             var xml = resp.ToString();
             return Content(xml, "text/xml");
-
         }
 
         /// <summary>
         /// Dials a number and then redirects to the DialStatus after dialing.
         /// </summary>
         /// <returns>ActionResult.</returns>
-        public ActionResult Dial()
+        public ActionResult Dial(CallAnswerResponseParameters response)
         {
+            // The response hold information passed from Plivo about the call.
+            // Just for illustration we serialize it up and send it to your email address
+            string r = SerializeObject.Serialize(response);
+            StringBuilder emailBody = new StringBuilder();
+            emailBody.Append("Hi\r\n");
+            emailBody.Append("Here is the param response from an incoming call.\r\n");
+            emailBody.Append(String.Format("{0} \r\n", r));
+            Email.SendEmail(_emailTo, "Incoming call params", emailBody.ToString());
+
+
             Plivo.XML.Response resp = new Plivo.XML.Response();
 
             // Generate Dial XML
@@ -193,7 +213,7 @@ namespace Plivo_MVC_Samples.Controllers
         /// </summary>
         /// <param name="response">The response.</param>
         /// <returns>ActionResult.</returns>
-        public ActionResult DialStatus(DialActionResponseParameters response)
+        public ActionResult DialStatus(DialStatusResponseParameters response)
         {
             // After completion of the call, Plivo will report back the status to the action URL in the Dial XML.
             String status = response.DialStatus;
@@ -213,16 +233,16 @@ namespace Plivo_MVC_Samples.Controllers
             Plivo.XML.Response resp = new Plivo.XML.Response();
 
             // Add Speak XML Tag
-            resp.AddSpeak("Hello, Welcome to Plivo", new Dictionary<string, string>() { });
-
-            Debug.WriteLine(resp.ToString());
+            resp.AddSpeak("Hello, Welcome to Plivo", new Dictionary<string, string>()
+            {
+            });
 
             var xml = resp.ToString();
             return Content(xml, "text/xml");
         }
 
         /// <summary>
-        /// Speak to the caller using text to speech.
+        /// Speak to the caller using text to speech demonstrating the use of language and voice tone
         /// </summary>
         /// <returns>ActionResult.</returns>
         /// <remarks>Example uses alternative languages for the text to speech.</remarks>
@@ -321,10 +341,11 @@ namespace Plivo_MVC_Samples.Controllers
         }
 
         /// <summary>
-        /// Voicemails this instance.
+        /// Records voicemail from the caller
         /// </summary>
         /// <returns>ActionResult.</returns>
         public ActionResult Voicemail(CallAnswerResponseParameters response)
+
         {
             // The response parameter contains information about the call.
             // You could optionally do something with this data such as save it to a database
@@ -332,10 +353,15 @@ namespace Plivo_MVC_Samples.Controllers
             // The CallUUID property can be used to link this calls related hops together.
 
             Plivo.XML.Response resp = new Plivo.XML.Response();
-            resp.AddSpeak("Please leave your message after the beep", new Dictionary<string, string>() { });
+            resp.AddSpeak("Please leave your message after the beep", new Dictionary<string, string>() {
+                    {"language", "en-GB"},
+                    {"voice", "WOMAN"}
+                });
+
             resp.AddRecord(new Dictionary<string, string>()
                 {
-                    {"action",_baseUrl + "Voice/SaveRecordUrl?From="+response.From}, // Submit the result of the record to this URL
+                    {"action",_baseUrl + "Voice/SaveRecordUrl?From="+response.From
+    }, // Submit the result of the record to this URL
                     {"method","GET"}, // HTTP method to submit the action URL
                     {"maxLength","30"}, // Maximum number of seconds to record 
                     {"transcriptionType","auto"}, // The type of transcription required

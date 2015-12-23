@@ -1,7 +1,7 @@
 ﻿namespace Plivo_MVC_Samples.Models
 {
     /// <summary>
-    /// Class RecordRequestParameters.
+    /// When a recording is made these parameters are sent to the ActionUrl that was specified in the AddRecord Plivo.XML.Response
     /// </summary>
     public class RecordResponseParameters
     {
@@ -16,7 +16,7 @@
         }
 
         /// <summary>
-        /// If set, Gets or sets the digits pressed to stop the record.
+        /// If set, Gets or sets the digit that was pressed to stop the record.
         /// </summary>
         /// <value>The digits.</value>
         public string Digits
@@ -54,7 +54,6 @@
             get;
             set;
         }
-
 
         /// <summary>
         /// Gets or sets the recording ended (epoch time UTC) in milliseconds.
