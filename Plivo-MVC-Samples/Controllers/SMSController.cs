@@ -12,6 +12,9 @@ using Plivo_MVC_Samples.Utilities;
 
 namespace Plivo_MVC_Samples.Controllers
 {
+    /// <summary>
+    /// The SMSController demonstrates ways of sending and receiving sms text messages.
+    /// </summary>
     public class SMSController : Controller
     {
         /// <summary>
